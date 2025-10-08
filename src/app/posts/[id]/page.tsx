@@ -1,4 +1,4 @@
-import { prisma } from "@/../lib/script";
+import { prisma } from "../../../../lib/prisma";
 
 import { notFound } from "next/navigation";
 
