@@ -6,7 +6,7 @@ export async function GET(
 	request: NextRequest,
 	{ params }: { params: { id: string }}
 ) {
-	const { id } = params;
+	const { id } = await params;
 
 	// check if is valid
 	const post = await prisma.post.findFirst(

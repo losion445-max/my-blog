@@ -1,13 +1,10 @@
-import { prisma } from "../../../../lib/prisma";
-
+import { Post } from "@prisma/client";
 import { notFound } from "next/navigation";
-
-export default async function Post(
-  {params}: {params: {id: string}}
+import { DeleteButton } from "./DeleteButton";
+export default async function PostPage(
+  { params }: { params: { id: string } }
 ) {
-	const post = await prisma.post.findUnique({
-		where: {id: parseInt(params.id)}
-	});
+  const post = await getPost({ params });
 
 	if (!post || !post.published) {
 		notFound();
@@ -17,9 +14,18 @@ export default async function Post(
     <div className="p-8 max-w-2xl mx-auto">
       <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
       <p className="text-gray-600 mb-6">
-        {post.createdAt.toLocaleDateString()}
+        {new Date(post.createdAt).toLocaleDateString('ru-RU')}
       </p>
       <div className="prose">{post.content}</div>
+      <DeleteButton postId={post.id}/>
     </div>
   );
+}
+
+
+async function getPost({params}: {params: {id: string}}) {
+  const { id } = await params;
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/posts/${id}`, {
+    cache: 'no-store',});
+    return await response.json() as Promise<Post>;
 }
