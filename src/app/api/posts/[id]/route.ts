@@ -21,6 +21,8 @@ export async function GET(
 				status: 404
 			});
 	}
+
+	return Response.json(post);
 }
 
 export async function PUT(
@@ -32,6 +34,22 @@ export async function PUT(
 	
 	const updatePost = await prisma.post.update({
 		where: {id: parseInt(id)},
-		ize: {title, content, published}
+		data: {title, content, published}
+	});
+	return Response.json(updatePost);
+}
+
+export async function DELETE(
+	request: NextRequest,
+	{ params }: { params: { id: string }}
+) {
+	const { id } = params;
+
+	await prisma.post.delete({
+		where: {id: parseInt(id)}
+	});
+
+	return Response.json({
+		message: "Post deleted"
 	});
 }
