@@ -4,7 +4,7 @@ import { NextRequest } from "next/server";
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string }}
+	{ params }: { params: Promise<{ id: string }> }
 ) {
 	const { id } = await params;
 
@@ -27,9 +27,9 @@ export async function GET(
 
 export async function PUT(
 	request: NextRequest,
-	{ params }: { params: { id: string }} 
+{ params }: { params: Promise<{ id: string }> }
 ) {
-	const { id } = params;
+	const { id } = await  params;
 	const { title, content, published } = await request.json();
 	
 	const updatePost = await prisma.post.update({
@@ -41,9 +41,9 @@ export async function PUT(
 
 export async function DELETE(
 	request: NextRequest,
-	{ params }: { params: { id: string }}
+	{ params }: { params: Promise<{ id: string }> }
 ) {
-	const { id } = params;
+	const { id } = await params;
 
 	await prisma.post.delete({
 		where: {id: parseInt(id)}
