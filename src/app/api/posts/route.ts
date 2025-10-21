@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import { withCors } from "./[id]/route";
 
 export async function GET() {
 	try {
@@ -20,10 +21,10 @@ export async function POST(request: NextRequest) {
 	try {
 	const {title, content, published = false} = await request.json();
 	if (!title || !content) {
-		return Response.json({
+		return withCors(Response.json({
 			error: "Title or content required",
 			status: 400
-		});
+		}));
 	}
 
 	const post = await prisma.post.create({
@@ -32,13 +33,14 @@ export async function POST(request: NextRequest) {
 		  	  content,
 		 	  published },
 			});
-	return Response.json(
+	return withCors (Response.json(
 		post, { status: 201 }
-	);
+	));
 	} catch (error) {
-		return Response.json({
+		return withCors(Response.json({
 			error: error,
 			status: 500
-		});
+		}));
 	}
 }
+

@@ -6,6 +6,7 @@ export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
+	
 	const { id } = await params;
 
 	// check if is valid
@@ -16,13 +17,13 @@ export async function GET(
 	);
 
 	if (!post) {
-		return Response.json(
+		return withCors(Response.json(
 			{   error: "Not found",
 				status: 404
-			});
+			}));
 	}
 
-	return Response.json(post);
+	return withCors(Response.json(post));
 }
 
 export async function PUT(
@@ -36,7 +37,7 @@ export async function PUT(
 		where: {id: parseInt(id)},
 		data: {title, content, published}
 	});
-	return Response.json(updatePost);
+	return withCors(Response.json(updatePost));
 }
 
 export async function DELETE(
@@ -49,7 +50,21 @@ export async function DELETE(
 		where: {id: parseInt(id)}
 	});
 
-	return Response.json({
+	return withCors(Response.json({
 		message: "Post deleted"
-	});
+	}));
+}
+
+
+export function withCors(response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("Access-Control-Allow-Origin", "*"); // или укажите ваш фронтенд: "https://your-site.com"
+  headers.set("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type");
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
