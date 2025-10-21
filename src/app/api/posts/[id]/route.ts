@@ -68,3 +68,7 @@ export function withCors(response: Response): Response {
     headers,
   });
 }
+
+export async function OPTIONS() {
+  return withCors(new Response(null, { status: 204 }));
+}
