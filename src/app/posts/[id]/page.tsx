@@ -1,9 +1,12 @@
 import { Post } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { DeleteButton } from "./DeleteButton";
+import { DeleteButton } from "@/components/DeleteButton";
+import { auth } from "../../../../lib/auth";
 export default async function PostPage(
   { params }: { params: { id: string } }
 ) {
+  const session = await auth();
+
   const post = await getPost({ params });
 
 	if (!post || !post.published) {
@@ -17,7 +20,7 @@ export default async function PostPage(
         {new Date(post.createdAt).toLocaleDateString('ru-RU')}
       </p>
       <div className="prose">{post.content}</div>
-      <DeleteButton postId={post.id}/>
+      {(session?.user?.id === post.authorId) && <DeleteButton postId={post.id}/>}
     </div>
   );
 }

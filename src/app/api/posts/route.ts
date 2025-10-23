@@ -1,11 +1,14 @@
 import { NextRequest } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { withCors } from "./[id]/route";
+import { auth } from "../../../../lib/auth";
 
 export async function GET() {
+
 	try {
 	const posts = await prisma.post.findMany({
 		orderBy: {createdAt: "desc"},
+		where: {published: true}
 	});
 	
 	return Response.json(posts);
@@ -18,6 +21,12 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+	const session = await auth();
+
+	if (!session?.user?.id) {
+		return new Response("Unathorized", { status: 401 });
+	}
+
 	try {
 	const {title, content, published = false} = await request.json();
 	if (!title || !content) {
@@ -31,8 +40,10 @@ export async function POST(request: NextRequest) {
 		data: 
 			{ title,
 		  	  content,
-		 	  published },
-			});
+		 	  published, 
+			  author: { connect: { id: session.user.id } }
+			},
+		});
 	return withCors (Response.json(
 		post, { status: 201 }
 	));

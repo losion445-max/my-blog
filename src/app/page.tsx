@@ -1,13 +1,18 @@
 import { Post } from "@prisma/client";
+import { auth } from "../../lib/auth";
+import LoginButton from "@/components/loginButton";
 export const dynamic = "force-dynamic";
 
 
 export default async function Home() {
+  const session = await auth();
+
   const posts = await getPosts();
 
   return (
     <div className="p-8 max-w-2xl mx-auto">
     <h1>My blog</h1>
+    {!session && <LoginButton />}
     {posts.map(post => ( 
       post.published && (
       <article key={post.id}>
@@ -16,6 +21,7 @@ export default async function Home() {
         </a>
         <p className="text-gray-600 mb-6">{post.content}</p>
         <small>{new Date(post.createdAt).toLocaleDateString('ru-RU')}</small>
+        
       </article>
       )))
     }

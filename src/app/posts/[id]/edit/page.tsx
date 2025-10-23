@@ -1,14 +1,18 @@
 "use client"
 
+import LoginButton from "@/components/loginButton";
 import { Post } from "@prisma/client";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 export default  function Edit(
 	{ params }: { params: { id: string } }
 ) {
+
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
 	const [published, setPublished] = useState(false);
 	const [isLoaded, setIsLoaded] = useState(false); 
+
 
 	useEffect(() => {
 		if (!isLoaded) 
@@ -20,6 +24,11 @@ export default  function Edit(
 			}).catch(err => console.error("Error: ", err))
 	});
 
+		const { data: session, status } = useSession();
+		if (!session) {
+			return <LoginButton/>;
+		}
+		
 		const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 	
