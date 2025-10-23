@@ -1,12 +1,13 @@
 import { prisma } from "../../../../../lib/prisma";
-
+import { auth } from "../../../../../lib/auth";
 import { NextRequest } from "next/server";
 
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
-	
+	const session = await auth();
+
 	const { id } = await params;
 
 	// check if is valid
@@ -23,6 +24,9 @@ export async function GET(
 			}));
 	}
 
+	if (!post.published && post.authorId !== session?.user?.id) {
+		return new Response("Not found", {status: 404});
+	}
 	return withCors(Response.json(post));
 }
 
@@ -30,9 +34,20 @@ export async function PUT(
 	request: NextRequest,
 { params }: { params: Promise<{ id: string }> }
 ) {
+	const session = await auth();
+	if (!session?.user?.id) {
+		return new Response("Unathorised", { status: 401 });
+	}
 	const { id } = await  params;
 	const { title, content, published } = await request.json();
-	
+
+	const post = await prisma.post.findUnique({
+		where: { id: parseInt(id)},
+		select: { authorId: true}
+	});
+	if (post?.authorId !== session.user.id) {
+		return new Response("Forbriden", { status: 401});
+	}
 	const updatePost = await prisma.post.update({
 		where: {id: parseInt(id)},
 		data: {title, content, published}
@@ -44,8 +59,18 @@ export async function DELETE(
 	request: NextRequest,
 	{ params }: { params: Promise<{ id: string }> }
 ) {
+	const session = await auth();
 	const { id } = await params;
+	
+	const post = await prisma.post.findUnique({
+		where: { id: parseInt(id)},
+		select: { authorId: true}
+	});
 
+	if (post?.authorId !== session?.user?.id) {
+		return new Response("Forbriden", { status: 401});
+	}
+		
 	await prisma.post.delete({
 		where: {id: parseInt(id)}
 	});
