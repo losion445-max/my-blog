@@ -1,37 +1,18 @@
-import { Post } from "@prisma/client";
-import { auth } from "../../lib/auth";
-import LoginButton from "@/components/loginButton";
+import PostCard from "@/components/features/PostCard";
+import { getPublishedPosts, getPublishedPostsWithAuthors } from "../../lib/posts";
+import { PostWithAuthor } from "@/components/features/PostCard";
+
 export const dynamic = "force-dynamic";
 
-
+// todo include sesion to header
 export default async function Home() {
-  const session = await auth();
-
-  const posts = await getPosts();
+  const posts = await getPublishedPostsWithAuthors();
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-    <h1>My blog</h1>
-    {!session && <LoginButton />}
-    {posts.map(post => ( 
-      post.published && (
-      <article key={post.id}>
-        <a href={`/posts/${post.id}`}>
-          <h2 className="text-4xl font-bold mb-4">{post.title}</h2>
-        </a>
-        <p className="text-gray-600 mb-6">{post.content}</p>
-        <small>{new Date(post.createdAt).toLocaleDateString('ru-RU')}</small>
-        
-      </article>
-      )))
-    }
+    <div className="space-y-6">
+      {posts.map((post, i) => (
+        <PostCard key={i} post={post as PostWithAuthor} />
+      ))} 
     </div>
   );
-}
-
-async function getPosts() {
-	const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/posts`, {
-    cache: 'no-store',
-  });
-		return response.json() as Promise<Post[]>;
 }

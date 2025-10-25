@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
 import { signIn } from "next-auth/react";
-
+import { Button } from "./ui/button";
 
 export default function LoginButton() {
-	return (
-		<button
-		 onClick={async () => {
-			signIn("google")}
-		}
-		 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">
-			Войти через гугл
-		</button>
-	)
+  return (
+    <Button
+      onClick={async () => {
+        signIn("google");
+      }}
+      className="ml-auto border rounded-md border-primary/30 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600"
+    >
+      Войти через гугл
+    </Button>
+  );
 }
