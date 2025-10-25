@@ -1,60 +1,81 @@
 import { prisma } from "../../../../../lib/prisma";
-
+import { auth } from "../../../../../lib/auth";
 import { NextRequest } from "next/server";
 
 export async function GET(
-	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-	
-	const { id } = await params;
+  const session = await auth();
 
-	// check if is valid
-	const post = await prisma.post.findFirst(
-		{
-			where: {id: parseInt(id)}
-		},
-	);
+  const { id } = await params;
 
-	if (!post) {
-		return withCors(Response.json(
-			{   error: "Not found",
-				status: 404
-			}));
-	}
+  // check if is valid
+  const post = await prisma.post.findFirst({
+    where: { id: parseInt(id) },
+  });
 
-	return withCors(Response.json(post));
+  if (!post) {
+    return withCors(Response.json({ error: "Not found", status: 404 }));
+  }
+
+  if (!post.published && post.authorId !== session?.user?.id) {
+    return new Response("Not found", { status: 404 });
+  }
+  return withCors(Response.json(post));
 }
 
 export async function PUT(
-	request: NextRequest,
-{ params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-	const { id } = await  params;
-	const { title, content, published } = await request.json();
-	
-	const updatePost = await prisma.post.update({
-		where: {id: parseInt(id)},
-		data: {title, content, published}
-	});
-	return withCors(Response.json(updatePost));
+  const session = await auth();
+  if (!session?.user?.id) {
+    return new Response("Unathorised", { status: 401 });
+  }
+  const { id } = await params;
+  const { title, content, published } = await request.json();
+
+  const post = await prisma.post.findUnique({
+    where: { id: parseInt(id) },
+    select: { authorId: true },
+  });
+  if (post?.authorId !== session.user.id) {
+    return new Response("Forbriden", { status: 401 });
+  }
+  const updatePost = await prisma.post.update({
+    where: { id: parseInt(id) },
+    data: { title, content, published },
+  });
+  return withCors(Response.json(updatePost));
 }
 
 export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-	const { id } = await params;
+  const session = await auth();
+  const { id } = await params;
 
-	await prisma.post.delete({
-		where: {id: parseInt(id)}
-	});
+  const post = await prisma.post.findUnique({
+    where: { id: parseInt(id) },
+    select: { authorId: true },
+  });
 
-	return withCors(Response.json({
-		message: "Post deleted"
-	}));
+  if (post?.authorId !== session?.user?.id) {
+    return new Response("Forbriden", { status: 401 });
+  }
+
+  await prisma.post.delete({
+    where: { id: parseInt(id) },
+  });
+
+  return withCors(
+    Response.json({
+      message: "Post deleted",
+    }),
+  );
 }
-
 
 export function withCors(response: Response): Response {
   const headers = new Headers(response.headers);

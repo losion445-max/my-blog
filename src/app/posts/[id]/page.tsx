@@ -1,31 +1,38 @@
-import { Post } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { DeleteButton } from "./DeleteButton";
-export default async function PostPage(
-  { params }: { params: { id: string } }
-) {
-  const post = await getPost({ params });
+import { DeleteButton } from "@/components/DeleteButton";
+import { auth } from "../../../../lib/auth";
+import { getPostWithAuthor } from "../../../../lib/posts";
+import EditButton from "@/components/features/EditButton";
 
-	if (!post || !post.published) {
-		notFound();
-	}
-
-	return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-      <p className="text-gray-600 mb-6">
-        {new Date(post.createdAt).toLocaleDateString('ru-RU')}
-      </p>
-      <div className="prose">{post.content}</div>
-      <DeleteButton postId={post.id}/>
-    </div>
-  );
-}
-
-
-async function getPost({params}: {params: {id: string}}) {
+export default async function PostPage({ params }: { params: { id: string } }) {
   const { id } = await params;
-  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/posts/${id}`, {
-    cache: 'no-store',});
-    return await response.json() as Promise<Post>;
+  const session = await auth();
+
+  const post = await getPostWithAuthor(id);
+  if (!post || !(session?.user?.id === post.authorId) && !post.published) {
+    notFound();
+  }
+
+  return (
+    <article className="max-w-4xl mx-auto px-4 w-full">
+      <header className="text-4xl">
+        <h1 className="text-4xl">{post.title}</h1>
+      </header>
+      <div className="mb-12 leading-relaxed">{post.content}</div>
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border">
+        <div className="">
+          <p>{post.author?.name}</p>
+          <p className="text-sm text-muted-foreground">Автор</p>
+        </div>
+        <time className="text-sm text-muted-foreground whitespace-nowrap">
+          {new Date(post.createdAt).toLocaleDateString("ru-RU")}
+        </time>
+        {session?.user?.id === post.author?.id && (
+          <div>
+            <DeleteButton postId={post.id} /> <EditButton postId={post.id} />
+          </div>
+        )}
+      </div>
+    </article>
+  );
 }
