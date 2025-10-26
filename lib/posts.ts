@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 
 export async function getPostWithAuthor(postId: string) {
+  // @ts-ignore
   return await prisma.post.findUnique({
     where: { id: parseInt(postId) },
     include: { author: true },  
@@ -19,6 +20,7 @@ export async function getPostsByUserId(userId: string | undefined) {
     where: {
       authorId: userId,
     },
+    include: { author: true },  
     orderBy: {
       createdAt: "desc",
     },
