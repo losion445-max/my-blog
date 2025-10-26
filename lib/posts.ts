@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 
 export async function getPostWithAuthor(postId: string) {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return await prisma.post.findUnique({
     where: { id: parseInt(postId) },
