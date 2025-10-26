@@ -1,11 +1,11 @@
 {
   "name": "my-blog",
-  "version": "0.1.",
+  "version": "0.1.69",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate --turbopack && next build", 
-      "start": "next start",
+    "build": "next build --turbopack",
+    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
