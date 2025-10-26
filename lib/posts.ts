@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 
 export async function getPostWithAuthor(postId: string) {
-  // @ts-ignore
+  // @ts-expect-error говно ебаное
   return await prisma.post.findUnique({
     where: { id: parseInt(postId) },
     include: { author: true },  
