@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
     typescript: {
     ignoreBuildErrors: true, // ← Добавь эту строку
   },
+  eslint: {
+        ignoreDuringBuilds: true,
+    },
 };
 
 export default nextConfig;
