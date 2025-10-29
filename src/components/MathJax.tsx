@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    MathJax: object;
+    // @ts-ignore
+    MathJax: any;
   }
 }
 
