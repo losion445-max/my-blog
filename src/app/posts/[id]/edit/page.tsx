@@ -1,4 +1,4 @@
-import PostForm from "@/components/features/PostForm";
+import PostForm from "../../../../components/features/PostForm";
 import { notFound } from "next/navigation";
 import { getPostWithAuthor } from "../../../../../lib/posts";
 

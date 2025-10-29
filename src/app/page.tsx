@@ -1,6 +1,6 @@
-import PostCard from "@/components/features/PostCard";
+import PostCard from "../components/features/PostCard";
 import { getPublishedPosts, getPublishedPostsWithAuthors } from "../../lib/posts";
-import { PostWithAuthor } from "@/components/features/PostCard";
+import { PostWithAuthor } from "../components/features/PostCard";
 
 export const dynamic = "force-dynamic";
 

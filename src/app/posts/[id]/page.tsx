@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { DeleteButton } from "@/components/DeleteButton";
+import { DeleteButton } from "../../../components/DeleteButton";
 import { auth } from "../../../../lib/auth";
 import { getPostWithAuthor } from "../../../../lib/posts";
-import EditButton from "@/components/features/EditButton";
+import EditButton from "../../../components/features/EditButton";
+import { Markdown } from "@/components/features/Markdown";
 
 export default async function PostPage({ params }: { params: { id: string } }) {
   const { id } = await params;
@@ -18,7 +19,7 @@ export default async function PostPage({ params }: { params: { id: string } }) {
       <header className="text-4xl">
         <h1 className="text-4xl">{post.title}</h1>
       </header>
-      <div className="mb-12 leading-relaxed">{post.content}</div>
+      <div className="mb-12 leading-relaxed"><Markdown content={post.content}/></div>
       <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border">
         <div className="">
           <p>{post.author?.name}</p>

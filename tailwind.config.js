@@ -78,5 +78,7 @@ module.exports = {
   // 4. Плагины
   plugins: [
     require("tailwindcss-animate"), // для анимаций в shadcn/ui
+    require("@tailwindcss/typography"), // 
+
   ],
 };

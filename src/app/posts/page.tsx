@@ -1,8 +1,7 @@
-import PostCard from "@/components/features/PostCard";
-import { Post } from "@prisma/client";
+import PostCard from "../../components/features/PostCard";
 import { auth } from "../../../lib/auth";
 import { getPostsByUserId } from "../../../lib/posts";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 export default async function PostPage() {
   const session = await auth();
